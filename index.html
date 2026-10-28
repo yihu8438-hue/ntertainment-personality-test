@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>如果你进入娱乐圈，会被培养成哪类明星？</title>
+<style>
+:root{--red:#b72c2c;--ink:#211e1b;--paper:#f8f2e7;--muted:#776e65}
+*{box-sizing:border-box}body{margin:0;background:#e9e2d8;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.65}
+.wrap{max-width:760px;margin:0 auto;padding:22px 14px 50px}.hero,.panel{background:var(--paper);border:1px solid #d7c9b8;box-shadow:0 8px 24px #32291a12}
+.hero{padding:28px 22px;margin-bottom:16px;position:relative;overflow:hidden}.stamp{display:inline-block;border:2px solid var(--red);color:var(--red);padding:2px 9px;font-size:12px;font-weight:800;transform:rotate(-3deg)}
+h1{font-size:clamp(30px,7vw,52px);line-height:1.18;letter-spacing:-1px;margin:18px 0 12px;font-weight:950}.red{color:var(--red)}.sub{color:var(--muted);margin:0}.meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}.pill{border:1px solid #d6c8b7;padding:5px 10px;font-size:12px}
+.panel{padding:20px;margin:14px 0}.intro h2,.result h2{margin-top:0}.progressline{height:7px;background:#e3d8c9;border-radius:99px;overflow:hidden;margin:12px 0 20px}.progress{height:100%;width:0;background:var(--red);transition:width .2s}
+.q{padding:18px 0;border-bottom:1px solid #e4d9ca}.q:last-child{border:0}.q h3{font-size:16px;margin:0 0 12px}.option{display:flex;align-items:flex-start;gap:10px;background:#fffaf2;border:1px solid #e5d8c8;padding:11px 12px;margin:8px 0;cursor:pointer;border-radius:5px;transition:.15s}.option:hover{border-color:var(--red)}.option:has(input:checked){border-color:var(--red);background:#fbe9e5}.option input{accent-color:var(--red);margin-top:5px;flex-shrink:0}
+button{border:0;background:var(--red);color:white;font-size:16px;font-weight:800;padding:13px 18px;border-radius:5px;cursor:pointer;width:100%;margin-top:12px}button.secondary{background:transparent;color:var(--red);border:1px solid var(--red)}button:disabled{opacity:.5;cursor:not-allowed}
+.small{font-size:12px;color:var(--muted)}.hidden{display:none!important}.resulttype{font-size:28px;font-weight:950;line-height:1.25;margin:8px 0}.resulttype span{color:var(--red)}.score{margin:12px 0}.bar{height:8px;background:#e6dbcd;border-radius:20px;overflow:hidden}.bar div{height:100%;background:var(--red)}.labelrow{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px}.tag{display:inline-block;background:#ead9ca;padding:4px 8px;margin:3px;font-size:12px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:16px}
+@media(min-width:600px){.hero{padding:38px}.panel{padding:28px}.q h3{font-size:17px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header class="hero">
+  <span class="stamp">娱乐圈模拟企划 · 原创测试</span>
+  <h1>如果你进入娱乐圈，<br>会被培养成<span class="red">哪类明星？</span></h1>
+  <p class="sub">24道情景题，测测你的明星原型、发展路线与潜在风险。</p>
+  <div class="meta"><span class="pill">约 3–5 分钟</span><span class="pill">6种结果类型</span><span class="pill">仅供娱乐</span></div>
+</header>
+<section class="panel intro" id="intro">
+<h2>开始前，请先了解</h2>
+<p>每题选一个最符合你真实反应的选项。不要选“看起来最好”的答案，选你最可能做出的选择。</p>
+<p class="small">本测试为娱乐性人格设定，不是经过科学验证的心理测验。答题结果仅在当前页面计算，不会上传你的答案。</p>
+<button id="startBtn">开始测试</button>
+</section>
+<section class="panel hidden" id="quiz">
+<div class="labelrow"><strong>你的答题进度</strong><span id="progressText">0 / 24</span></div>
+<div class="progressline"><div class="progress" id="progress"></div></div>
+<form id="quizForm"><div id="questions"></div>
+<button type="button" id="submitBtn">查看我的测试结果</button>
+<p class="small">你可以随时修改答案；答完全部题目后，结果会更完整。</p>
+</form>
+</section>
+<section class="panel result hidden" id="result" aria-live="polite">
+<span class="stamp">你的测试报告</span>
+<h2>经纪公司内部评估</h2>
+<div class="resulttype" id="resultTitle"></div>
+<p id="resultSubtitle"></p>
+<div id="scoreBars"></div>
+<hr style="border:0;border-top:1px solid #dfd2c2;margin:22px 0">
+<h3>你的优势</h3><p id="strength"></p>
+<h3>适合的发展路线</h3><p id="route"></p>
+<h3>需要留意的风险</h3><p id="risk"></p>
+<p class="small" id="answeredNote"></p>
+<button id="shareBtn">复制结果文案</button>
+<button class="secondary" id="retryBtn">重新测试</button>
+</section>
+<footer>原创娱乐测试 · 请勿将测试结果当作专业心理诊断</footer>
+</main>
+<script>
+const qs = [
+["公司第一次给你安排人设，你希望自己是什么样的人？",["实力过硬，作品说话","颜值出众，自带话题","亲切有趣，综艺感强","神秘特别，不按常理出牌"]],
+["参加一场有很多大咖的晚宴，你会怎么做？",["找专业人士交流，积累资源","注意自己的形象，争取留下印象","主动聊天，让大家都开心","先观察全场，寻找最值得接触的人"]],
+["导演说你演得不够好，你的第一反应是？",["追问具体问题，回去练习","有些不服，想证明自己","先缓和气氛，再慢慢调整","不急着辩解，先判断导演真正想要什么"]],
+["出道半年，你的曝光量依然很低，你会？",["打磨作品，等待机会","主动寻找能出圈的造型和话题","经营账号，多和粉丝互动","改变策略，寻找更有辨识度的路线"]],
+["公司让你参加一档不太符合你风格的综艺，你会？",["评估节目是否能提升专业能力","如果能增加曝光，就认真尝试","觉得是认识新朋友的机会","先研究节目定位，再决定怎么表现"]],
+["你最希望观众记住你的哪一点？",["业务能力真的很强","一眼就能记住的个人魅力","真实可爱，很有亲和力","有自己的想法，难以被定义"]],
+["面对镜头时，你通常是什么状态？",["有明确目标时表现最好","越多人关注，越有动力","放松自然，很容易进入状态","先观察环境，再决定展示多少自己"]],
+["如果你突然获得一笔发展资金，你会优先投入什么？",["专业训练和作品","形象包装和宣传","社交团队和粉丝运营","独特项目和长期布局"]],
+["同期出道的人突然爆红，你会？",["分析差距，提升自己的实力","感到竞争压力，赶紧寻找机会","真心祝贺，也主动保持联系","研究对方的路径，调整自己的打法"]],
+["你最难接受哪种评价？",["你根本没有实力","你一点都不特别","你这个人很难相处","你没有自己的风格"]],
+["一次采访中，主持人突然问了一个尖锐问题，你会？",["直接说明事实，尽量讲清楚","用自信的方式回应，不让自己失去气势","用幽默转移气氛，避免场面尴尬","先判断问题的意图，再谨慎回答"]],
+["你在团队里最自然的角色是？",["负责把事情做好的专业担当","负责带动竞争和目标的人","负责协调气氛的人","负责分析局势、制定策略的人"]],
+["如果有机会和一位顶级明星合作，你最在意什么？",["能否学到真正的专业本领","合作能否让更多人认识我","能否建立长期友好的关系","这次合作能否打开新的发展方向"]],
+["你的某段旧采访突然被大量转发，你会？",["检查内容是否准确，需要时补充说明","抓住关注度，推出新的作品或活动","和粉丝交流，了解大家的看法","观察舆论走向，再决定是否回应"]],
+["你发现团队内部有人不喜欢你，你会？",["继续把自己的工作做好","用成绩争取更多话语权","主动沟通，减少误会","保持边界，观察是否影响合作"]],
+["如果只能选择一种长期发展方式，你会选？",["靠高质量作品积累口碑","靠个人魅力持续扩大知名度","靠亲和力经营稳定的观众群","靠差异化定位建立不可替代性"]],
+["一场活动中，你的搭档意外忘词了，你会？",["自然接话，保证流程顺利","稳住场面，同时展现自己的能力","轻松圆场，让搭档不那么紧张","快速调整流程，避免问题扩大"]],
+["当你拥有一定知名度后，你最想争取什么？",["有分量的奖项和代表作","更大的商业价值和公众影响力","更自由的工作方式和良好关系","更多选择权和创作主导权"]],
+["如果一部作品让你意外走红，你接下来会？",["尽快拿出能证明实力的新作品","加大宣传，把热度转化成机会","保持互动，让观众进一步了解我","谨慎选择下一步，避免被固定标签"]],
+["面对网络上的负面评论，你最可能？",["只关注有事实依据的批评","不甘心被误解，想要证明自己","会在意别人的感受，也寻找支持","区分情绪和事实，决定是否回应"]],
+["经纪人建议你隐藏一部分真实个性，以符合人设，你会？",["只要不影响底线，可以专注作品","如果能带来机会，愿意阶段性配合","希望保留真实感，不想让观众失望","重新协商，设计更适合自己的定位"]],
+["你最擅长的竞争方式是？",["长期积累，用实力说话","快速行动，抓住机会","建立信任，让合作更顺畅","找到别人没有注意到的突破口"]],
+["如果突然拥有很高的知名度，你最担心什么？",["实力跟不上关注度","热度消退，被别人取代","私生活受影响，失去自在","被公众标签限制，失去选择权"]],
+["十年后，你希望自己处于什么状态？",["有代表作、受业内认可的演员或创作者","拥有影响力和商业号召力的明星","有观众缘、能自由选择项目的艺人","拥有创作自主权和独特行业地位的人"]]
+];
+const types = {
+A:{name:"实力派王牌",subtitle:"你的关键词：专业、可靠、长期主义",strength:"你更愿意用实际表现建立信任，遇到问题时倾向于复盘和提升。你适合把一个领域做深，逐渐形成自己的代表作。",route:"专业训练、优质作品、长期口碑。先积累硬实力，再通过采访、作品幕后等方式让观众看见你的特点。",risk:"容易把注意力全放在打磨自己上，忽略表达和曝光。记得让好作品被更多人看见。"},
+B:{name:"话题流量明星",subtitle:"你的关键词：存在感、行动力、机会嗅觉",strength:"你希望自己的努力被看见，也愿意主动争取机会。面对竞争，你通常更容易被目标激发行动力。",route:"个人品牌、镜头表现、公开表达和商业合作。用稳定的内容与作品承接关注度，而不只追逐短期热度。",risk:"可能过度在意外界评价或短期数据。热度是工具，不必为了关注牺牲长期信誉和个人边界。"},
+C:{name:"国民好感型",subtitle:"你的关键词：亲和、共情、合作感",strength:"你会留意交流气氛，也比较重视他人的感受。亲切自然的表达，容易帮助你建立信任与长期关系。",route:"访谈、综艺、生活类内容和团队合作。保留真实个性，让观众通过持续的内容认识你。",risk:"可能为了照顾所有人而压抑自己的想法。友善不等于凡事答应，清楚表达边界也很重要。"},
+D:{name:"神秘谋略型",subtitle:"你的关键词：观察、策略、独特性",strength:"你倾向于先收集信息，再选择行动方式。你重视自主权，也希望建立不容易被复制的个人风格。",route:"差异化定位、深度访谈、创作策划和有辨识度的项目。让适度的神秘感与真实作品相互支撑。",risk:"过度观察和谨慎可能让别人难以了解你。合适的时候主动表达，比一直保持距离更有帮助。"}
+};
+const labels=["A · 实力派王牌","B · 话题流量明星","C · 国民好感型","D · 神秘谋略型"];
+const form=document.getElementById("quizForm"), qwrap=document.getElementById("questions");
+qs.forEach((q,i)=>{const div=document.createElement("div");div.className="q";div.innerHTML=`<h3>${i+1}. ${q[0]}</h3>`+q[1].map((v,j)=>`<label class="option"><input type="radio" name="q${i}" value="${"ABCD"[j]}"><span><b>${"ABCD"[j]}.</b> ${v}</span></label>`).join("");qwrap.appendChild(div)});
+function updateProgress(){const n=qs.reduce((s,_,i)=>s+(form.querySelector(`input[name="q${i}"]:checked`)?1:0),0);document.getElementById("progressText").textContent=`${n} / 24`;document.getElementById("progress").style.width=(n/24*100)+"%"}
+form.addEventListener("change",updateProgress);
+document.getElementById("startBtn").onclick=()=>{document.getElementById("intro").classList.add("hidden");document.getElementById("quiz").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"})};
+document.getElementById("submitBtn").onclick=()=>{
+ const ans=qs.map((_,i)=>form.querySelector(`input[name="q${i}"]:checked`)?.value||null);
+ const missing=ans.filter(x=>!x).length;
+ const scores={A:0,B:0,C:0,D:0};ans.filter(Boolean).forEach(x=>scores[x]++);
+ const sorted=Object.entries(scores).sort((a,b)=>b[1]-a[1]);const top=sorted[0][1];const tied=sorted.filter(x=>x[1]===top).map(x=>x[0]);
+ let main=types[tied[0]], title=main.name, subtitle=main.subtitle, strength=main.strength, route=main.route, risk=main.risk;
+ if(tied.length>1){const pair=tied.slice(0,2);const pairNames={"A+B":"实力与流量双核型","A+C":"反差感黑马","A+D":"冷静实力派","B+C":"高亲和话题型","B+D":"争议话题型","C+D":"温柔观察型"};const key=pair.join("+");title=pairNames[key]||pairNames[pair.slice().reverse().join("+")]||"多面发展型";subtitle="你的选择呈现出两种并存的倾向："+pair.map(k=>types[k].name).join(" + ");strength=pair.map(k=>types[k].strength).join(" ");route=pair.map(k=>types[k].route).join(" ");risk=pair.map(k=>types[k].risk).join(" ")}
+ document.getElementById("resultTitle").innerHTML=`<span>${title}</span>`;
+ document.getElementById("resultSubtitle").textContent=subtitle;
+ document.getElementById("strength").textContent=strength;document.getElementById("route").textContent=route;document.getElementById("risk").textContent=risk;
+ document.getElementById("answeredNote").textContent=missing?`你还有 ${missing} 题未答；当前结果按已答题目计算，建议答完后重新查看。`:"你已完成全部24题。结果来自你选择的选项次数，仅供娱乐和自我观察。";
+ document.getElementById("scoreBars").innerHTML=Object.entries(scores).map(([k,v])=>`<div class="score"><div class="labelrow"><span>${labels["ABCD".indexOf(k)]}</span><b>${v}分</b></div><div class="bar"><div style="width:${v/24*100}%"></div></div></div>`).join("");
+ document.getElementById("quiz").classList.add("hidden");document.getElementById("result").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"});
+};
+document.getElementById("retryBtn").onclick=()=>{form.reset();updateProgress();document.getElementById("result").classList.add("hidden");document.getElementById("quiz").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"})};
+document.getElementById("shareBtn").onclick=async()=>{const text=`我的娱乐圈人格测试结果：${document.getElementById("resultTitle").innerText}\n${document.getElementById("resultSubtitle").innerText}\n${document.getElementById("strength").innerText}\n测试链接由我自己制作，结果仅供娱乐。`;try{await navigator.clipboard.writeText(text);document.getElementById("shareBtn").textContent="已复制！可以去分享了"}catch(e){const ta=document.createElement("textarea");ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();document.getElementById("shareBtn").textContent="已复制！可以去分享了"}};
+</script>
+</body>
+</html>
